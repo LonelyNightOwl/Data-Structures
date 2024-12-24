@@ -1,0 +1,119 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure for the doubly linked list node
+struct Node {
+    int data;
+    struct Node* next;
+    struct Node* prev;
+};
+
+// Function to create a new node
+struct Node* createNode(int value) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = value;
+    newNode->next = NULL;
+    newNode->prev = NULL;
+    return newNode;
+}
+
+// Function to insert a node at the beginning
+void insertAtBeginning(struct Node** head, int value) {
+    struct Node* newNode = createNode(value);
+    if (*head == NULL) {
+        *head = newNode;
+    } else {
+        newNode->next = *head;
+        (*head)->prev = newNode;
+        *head = newNode;
+    }
+}
+
+// Function to insert a node at the end
+void insertAtEnd(struct Node** head, int value) {
+    struct Node* newNode = createNode(value);
+    if (*head == NULL) {
+        *head = newNode;
+    } else {
+        struct Node* temp = *head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+        newNode->prev = temp;
+    }
+}
+
+// Function to delete a node with a given value
+void deleteNode(struct Node** head, int value) {
+    struct Node* temp = *head;
+    while (temp != NULL && temp->data != value) {
+        temp = temp->next;
+    }
+
+    if (temp == NULL) {
+        printf("Node with value %d not found.\n", value);
+        return;
+    }
+
+    if (*head == temp) {
+        *head = temp->next; // Move head if the node to be deleted is the first node
+    }
+
+    if (temp->next != NULL) {
+        temp->next->prev = temp->prev;
+    }
+
+    if (temp->prev != NULL) {
+        temp->prev->next = temp->next;
+    }
+
+    free(temp);
+    printf("Node with value %d deleted.\n", value);
+}
+
+// Function to print the list from the beginning to the end
+void printListFromHead(struct Node* head) {
+    struct Node* temp = head;
+    printf("List (Head to Tail): ");
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+// Function to print the list from the end to the beginning
+void printListFromTail(struct Node* head) {
+    if (head == NULL) return;
+
+    struct Node* temp = head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+
+    printf("List (Tail to Head): ");
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->prev;
+    }
+    printf("\n");
+}
+
+int main() {
+    struct Node* head = NULL;
+
+    insertAtBeginning(&head, 10);
+    insertAtBeginning(&head, 20);
+    insertAtEnd(&head, 30);
+    insertAtEnd(&head, 40);
+
+    printListFromHead(head);
+    printListFromTail(head);
+
+    deleteNode(&head, 20);
+    printListFromHead(head);
+    printListFromTail(head);
+
+    return 0;
+}
