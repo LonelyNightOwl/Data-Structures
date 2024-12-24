@@ -1,0 +1,110 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure for the node
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// Function to create a new node
+struct Node* createNode(int value) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = value;
+    newNode->next = newNode; // The next node points to itself (circular)
+    return newNode;
+}
+
+// Function to insert a node at the end
+void insertAtEnd(struct Node** head, int value) {
+    struct Node* newNode = createNode(value);
+    if (*head == NULL) {
+        *head = newNode; // If the list is empty, make the new node the head
+    } else {
+        struct Node* temp = *head;
+        while (temp->next != *head) {
+            temp = temp->next;
+        }
+        temp->next = newNode;  // Last node points to the new node
+        newNode->next = *head; // New node points back to the head
+    }
+}
+
+// Function to delete a node with a given value
+void deleteNode(struct Node** head, int value) {
+    if (*head == NULL) {
+        printf("The list is empty.\n");
+        return;
+    }
+
+    struct Node* temp = *head;
+    struct Node* prev = NULL;
+
+    // If the node to be deleted is the head node
+    if (temp->data == value) {
+        if (temp->next == *head) {  // Only one node in the list
+            free(temp);
+            *head = NULL;
+            return;
+        } else {
+            prev = *head;
+            while (temp->next != *head) {
+                temp = temp->next;
+            }
+            prev->next = (*head)->next;
+            free(*head);
+            *head = prev->next;
+            return;
+        }
+    }
+
+    // Search for the node to be deleted
+    while (temp->next != *head && temp->data != value) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    if (temp->data == value) {
+        prev->next = temp->next;
+        free(temp);
+    } else {
+        printf("Node with value %d not found.\n", value);
+    }
+}
+
+// Function to print the list
+void printList(struct Node* head) {
+    if (head == NULL) {
+        printf("The list is empty.\n");
+        return;
+    }
+
+    struct Node* temp = head;
+    printf("List: ");
+    do {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    } while (temp != head); // Traverse the circular list
+    printf("\n");
+}
+
+int main() {
+    struct Node* head = NULL;
+
+    insertAtEnd(&head, 10);
+    insertAtEnd(&head, 20);
+    insertAtEnd(&head, 30);
+    insertAtEnd(&head, 40);
+
+    printList(head);
+
+    deleteNode(&head, 20);
+    printList(head);
+
+    deleteNode(&head, 10);
+    printList(head);
+
+    deleteNode(&head, 50); // Try deleting a node that does not exist
+
+    return 0;
+}
